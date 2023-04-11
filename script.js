@@ -8,16 +8,22 @@ function addVertex(canvas,x,y){
         left:x-5,
         top:y-5,
     });
+    v.set('selectable',false)
     canvas.add(v);
     canvas.renderAll();
 }
 function main() {
     var canvas=new fabric.Canvas("c");
-    console.log("I'm here");
+    canvas.setWidth($(window).outerWidth()*0.45);
+    canvas.setHeight(600);
 
     canvas.on("mouse:down",function(options){
-        addVertex(canvas,options.e.clientX,options.e.clientY);
-        console.log("Add a vertex");
-    })
+        if(options.target){
+            options.target.setFill("Red");}
+        else {
+            var ptr=canvas.getPointer(options.e,true);
+            addVertex(canvas,ptr.x,ptr.y);
+        }
+    });
 
 }

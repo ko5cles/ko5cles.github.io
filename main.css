@@ -1,6 +1,31 @@
 body {
+    font-size: 18px;
 }
+
+header{
+    text-align: center;
+    padding: 10px;
+    font-size: 35px;
+}
+
 canvas {
     display: block;
     outline: black 3px solid;
+}
+
+.column {
+    float: left;
+    width: 50%;
+    margin-bottom: 15px;
+}
+
+.subcolumn{
+    float: left;
+    width: 50%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
 }
