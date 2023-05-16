@@ -36,10 +36,9 @@ function AddVertex(canvas,x,y,color){
     v.selectable=false;
     vertices.push(v);
     canvas.add(v);
-    canvas.renderAll();
 }
 
-function AddDirectedLine(canvas,coords,color,weight){
+function AddDirectedLine(canvas,coords,color,weight,position='up'){
     let ang;
     if(coords[1]===coords[3]){
         ang=90;
@@ -60,96 +59,45 @@ function AddDirectedLine(canvas,coords,color,weight){
         top:(coords[1]+coords[3])/2-8.5,
     });
     t.rotate(ang);
-    let text=new fabric.Text(weight.toString(),{
-        fontSize:10,
-        left:(coords[0]+coords[2])/2-5,
-        top:(coords[1]+coords[3])/2-20,
-        fill:color,
-    })
-    let g=new fabric.Group([l,t,text]);
-    g.selectable=false;
-    canvas.add(g);
-    g.sendToBack();
-    canvas.renderAll();
-}
-function AddCurvedLine(canvas,coords,color,x,weight){
-    console.log("I'm drawing a curved line");
-    let x1=coords[0];
-    let y1=coords[1];
-    let x2=coords[2];
-    let y2=coords[3];
-    let d=Math.sqrt((x2-x1)**2+(y2-y1)**2);
-    let c=d/2;
-    let r=(x**2+c**2)/(2*x);
-    console.log("r:",r,"x1y1x2y2:",x1,y1,x2,y2,"d",d,"c",c);
-    if(y1===y2){
-        let angle=Radius2Degree(Math.acos(Math.abs(x2-x1)/(2*r)));
-        let c_up= new fabric.Circle({
-            radius: r,
-            left:(x1+x2)/2-r,
-            top:(y1-x),
-            stroke:color,
-            fill:"",
-            startAngle: 180+angle,
-            endAngle: 360-angle,
-        });
-        let c_down=new fabric.Circle({
-            radius: r,
-            left:(x1+x2)/2-r,
-            top:(y1-2*r+x),
-            stroke:color,
-            fill:"",
-            startAngle: angle,
-            endAngle: 180-angle,
+    if(position==='up'){
+        let text=new fabric.Text(weight.toString(),{
+            fontSize:10,
+            left:(coords[0]+coords[2])/2-5,
+            top:(coords[1]+coords[3])/2-20,
+            fill:color,
         })
-        canvas.add(c_up);
-        canvas.add(c_down);
-    }else{
-        let A=(y2-y1)/(x2-x1);
-        let B=-1;
-        let C=y1-(y2-y1)/(x2-x1)*x1;
-        let k_prime=(x1-x2)/(y2-y1);
-        let b_prime=(y2+y1)/2-(x1**2-x2**2)/(2*y2-2*y1);
-        let x01=(Math.sqrt(A**2+B**2)*(r-x)-B-b_prime-C)/(A+B*k_prime);
-        let x02=(-Math.sqrt(A**2+B**2)*(r-x)-B-b_prime-C)/(A+B*k_prime);
-        let y01=k_prime*x01+b_prime;
-        let y02=k_prime*x02+b_prime;
-        if(y1<y2){
-            console.log("x01,y01:");
-            console.log(x01,y01);
-            if(x01<x2){
-                let angle1=Radius2Degree(Math.acos((x2-x01)/r));
-                let angle2=Radius2Degree(Math.acos((x01-x1)/r));
-                let c_up= new fabric.Circle({
-                    radius: r,
-                    left:(x1+x2)/2-r,
-                    top:(y1-x),
-                    stroke:color,
-                    fill:"",
-                    startAngle: 180+angle1,
-                    endAngle: 360-angle2,
-                });
-                canvas.add(c_up);
-            }else{
-                let angle1=Radius2Degree(Math.acos((x01-x2)/r));
-                let angle2=Radius2Degree(Math.acos((x01-x1)/r));
-                let c_up= new fabric.Circle({
-                    radius: r,
-                    left:(x1+x2)/2-r,
-                    top:(y1-x),
-                    stroke:color,
-                    fill:"",
-                    startAngle: 360-angle1,
-                    endAngle: 360-angle2,
-                });
-                canvas.add(c_up);
-            }
-        }else{
 
-        }
+        let g=new fabric.Group([l,t,text]);
+        g.selectable=false;
+        canvas.add(g);
+        g.sendToBack();
+    }else{
+        let text=new fabric.Text(weight.toString(),{
+            fontSize:10,
+            left:(coords[0]+coords[2])/2+5,
+            top:(coords[1]+coords[3])/2+15,
+            fill:color,
+        })
+
+        let g=new fabric.Group([l,t,text]);
+        g.selectable=false;
+        canvas.add(g);
+        g.sendToBack();
     }
+
 }
 
+function AddLOLine(canvas,coords,weight){
+    coords[1]=coords[1]-10;
+    coords[3]=coords[3]-10;
+    AddDirectedLine(canvas,coords,'#FF1493',weight);
+}
+
+function AddRLine(canvas,coords,weight){
+    coords[1]=coords[1]+10;
+    coords[3]=coords[3]+10;
+    AddDirectedLine(canvas,coords,'#00008B',weight,'down');
+}
 function ClearResidualMatrix(){
     for(let i=0;i<vertices.length;i++){
         for(let j=0;j<vertices.length;j++){
@@ -179,12 +127,82 @@ function DrawResidualNetwork(canvas){
             if(leftover_matrix[i][j]!==-1){
                 let p1=vertices[i].getCenterPoint();
                 let p2=vertices[j].getCenterPoint();
-                AddCurvedLine(canvas,[p1.x,p1.y,p2.x,p2.y],'black',5,0);
+                AddLOLine(canvas,[p1.x,p1.y,p2.x,p2.y],leftover_matrix[i][j]);
+            }
+            if(reverse_matrix[i][j]!==-1){
+                let p1=vertices[i].getCenterPoint();
+                let p2=vertices[j].getCenterPoint();
+                AddRLine(canvas,[p1.x,p1.y,p2.x,p2.y],reverse_matrix[i][j]);
             }
         }
     }
     canvas.renderAll();
 }
+class Node{
+    constructor(parent,index,weight) {
+        this.parent=parent;
+        this.index=index;
+        this.weight=weight;
+    }
+}
+function BFS(){
+    let visited=[];
+    for(let i=0;i<vertices.length;i++){
+        visited.push(0);
+    }
+    let queue=[];
+    let root=new Node(null,0,null);
+    let path_existed=false;
+    queue.push(root);
+    visited[0]=1;
+    let v;
+    while(queue.length!==0 && !path_existed){
+        v=queue.shift();
+        let index=v.index;
+        for(let j=0;j<vertices.length;j++){
+            if (index===1){// T is found
+                path_existed=true;
+                break;
+            }
+            if(flow_matrix[index][j]!==-1){ //an edge exist from v
+                if(visited[j]===0){//that child node has not been visited
+                    visited[j]=1;
+                    let temp=new Node(v,j,flow_matrix[index][j]);
+                    queue.push(temp)
+                }
+            }
+            if(reverse_matrix[index][j]!==-1){
+                if(visited[j]===0){//that child node has not been visited
+                    visited[j]=1;
+                    let temp=new Node(v,j,reverse_matrix[index][j]);
+                    queue.push(temp)
+                }
+            }
+        }
+    }
+    let min_weight=Infinity;
+    let index_list=[];
+    if(path_existed){
+        while(v.parent!==null){
+            if(v.weight<min_weight){
+                min_weight=v.weight;
+            }
+            index_list.push(v.index);
+            v=v.parent;
+        }
+        index_list.push(v.index);
+        return [true,min_weight,index_list];
+    }else{
+        return [false,null,null];
+    }
+
+
+}
+
+function OutlinePathResidualNetwork(){
+
+}
+
 function Handle(ins,b1,inp,canvas){
     if (step===0){
         ins.text("Click on canvas to add S.");
@@ -231,6 +249,7 @@ function Handle(ins,b1,inp,canvas){
             let p1=prev.getCenterPoint();
             let p2=cur.getCenterPoint();
             AddDirectedLine(canvas,[p1.x,p1.y,p2.x,p2.y],"black",inp.val());
+            canvas.renderAll();
             //draw line and triangle
         }
         step=12;
@@ -262,8 +281,11 @@ function Handle(ins,b1,inp,canvas){
             step=13;
         }
     }else if(step===13){
-        ins.text("Let's first construct a residual network. We'll first assume all the edges have flows of 0");
+        ins.text("Let's first construct a residual network. Initially, all the edges have flows of 0.");
         b1.text("Next");
+        HandleCanvas(ins,b1,inp,canvas,null);
+    }else if(step===14){
+        ins.text("Then we will apply BFS to search a path from S to T.");
         HandleCanvas(ins,b1,inp,canvas,null);
     }
 }
@@ -273,13 +295,16 @@ function HandleCanvas(ins,b1,inp,canvas,options){
         if(!options.target){
             let ptr=canvas.getPointer(options.e,true);
             AddVertex(canvas,ptr.x,ptr.y,"blue");
+            canvas.renderAll();
             step=2;
             Handle(ins,b1,inp,canvas);
         }
     }else if(step===3){
+        console.log("I'm here");
         if(!options.target){
             let ptr=canvas.getPointer(options.e,true);
             AddVertex(canvas,ptr.x,ptr.y,"blue");
+            canvas.renderAll();
             step=4;
             Handle(ins,b1,inp,canvas);
         }
@@ -287,6 +312,7 @@ function HandleCanvas(ins,b1,inp,canvas,options){
         if(!options.target){
             let ptr=canvas.getPointer(options.e,true);
             AddVertex(canvas,ptr.x,ptr.y,"black");
+            canvas.renderAll();
         }
     }else if(step===7 || step===12){
         if(options.target){
@@ -307,10 +333,22 @@ function HandleCanvas(ins,b1,inp,canvas,options){
             Handle(ins,b1,inp,canvas);
         }
     }else if(step===13){
-        canvas.clear();
+        canvas.remove(canvas.getObjects());
         DrawResidualNetwork(canvas);
         step=14;
+    }else if(step===14){
+        let result=BFS();
+        if (result[0]===true){
+            console.log("min weight",result[1]);
+            for(let i=0;i<result[2].length;i++){
+                console.log(result[2][i]);
+            }
+        }else{
+            console.log("Not found");
+        }
+        OutlinePathResidualNetwork();
     }
+    step=15;
 }
 function main() {
     let canvas = new fabric.Canvas("c",{selection:false});
