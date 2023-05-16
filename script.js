@@ -12,7 +12,9 @@ let step=0;
 let capacities_matrix=[];
 let flow_matrix=[];
 let reverse_matrix=[];
-let leftover_matrix=[]
+let leftover_matrix=[];
+let maximum_capacity=0;
+let edges={};
 
 function Radius2Degree(rad){
     return rad*180/Math.PI;
@@ -71,6 +73,7 @@ function AddDirectedLine(canvas,coords,color,weight,position='up'){
         g.selectable=false;
         canvas.add(g);
         g.sendToBack();
+        return g;
     }else{
         let text=new fabric.Text(weight.toString(),{
             fontSize:10,
@@ -83,6 +86,7 @@ function AddDirectedLine(canvas,coords,color,weight,position='up'){
         g.selectable=false;
         canvas.add(g);
         g.sendToBack();
+        return g;
     }
 
 }
@@ -90,13 +94,15 @@ function AddDirectedLine(canvas,coords,color,weight,position='up'){
 function AddLOLine(canvas,coords,weight){
     coords[1]=coords[1]-10;
     coords[3]=coords[3]-10;
-    AddDirectedLine(canvas,coords,'#FF1493',weight);
+    let g=AddDirectedLine(canvas,coords,'#FF1493',weight);
+    return g;
 }
 
 function AddRLine(canvas,coords,weight){
     coords[1]=coords[1]+10;
     coords[3]=coords[3]+10;
-    AddDirectedLine(canvas,coords,'#00008B',weight,'down');
+    let g=AddDirectedLine(canvas,coords,'#00008B',weight,'down');
+    return g;
 }
 function ClearResidualMatrix(){
     for(let i=0;i<vertices.length;i++){
@@ -117,7 +123,13 @@ function CalculateResidualMatrix(){
         }
     }
 }
+function ClearEdges(){
+    for(const member in edges){
+        delete edges[member];
+    }
+}
 function DrawResidualNetwork(canvas){
+    ClearEdges();
     for(let i=0;i<vertices.length;i++){
         canvas.add(vertices[i]);
     }
@@ -127,12 +139,16 @@ function DrawResidualNetwork(canvas){
             if(leftover_matrix[i][j]!==-1){
                 let p1=vertices[i].getCenterPoint();
                 let p2=vertices[j].getCenterPoint();
-                AddLOLine(canvas,[p1.x,p1.y,p2.x,p2.y],leftover_matrix[i][j]);
+                let g=AddLOLine(canvas,[p1.x,p1.y,p2.x,p2.y],leftover_matrix[i][j]);
+                let str=i.toString()+":"+j.toString();
+                edges[str]=g;
             }
             if(reverse_matrix[i][j]!==-1){
                 let p1=vertices[i].getCenterPoint();
                 let p2=vertices[j].getCenterPoint();
-                AddRLine(canvas,[p1.x,p1.y,p2.x,p2.y],reverse_matrix[i][j]);
+                let g=AddRLine(canvas,[p1.x,p1.y,p2.x,p2.y],reverse_matrix[i][j]);
+                let str=i.toString()+":"+j.toString();
+                edges[str]=g;
             }
         }
     }
@@ -164,14 +180,14 @@ function BFS(){
                 path_existed=true;
                 break;
             }
-            if(flow_matrix[index][j]!==-1){ //an edge exist from v
+            if(leftover_matrix[index][j]!==-1 && leftover_matrix[index][j]!==0){ //an edge exist from v
                 if(visited[j]===0){//that child node has not been visited
                     visited[j]=1;
-                    let temp=new Node(v,j,flow_matrix[index][j]);
+                    let temp=new Node(v,j,leftover_matrix[index][j]);
                     queue.push(temp)
                 }
             }
-            if(reverse_matrix[index][j]!==-1){
+            if(reverse_matrix[index][j]!==-1 && reverse_matrix[index][j]!==0){
                 if(visited[j]===0){//that child node has not been visited
                     visited[j]=1;
                     let temp=new Node(v,j,reverse_matrix[index][j]);
@@ -195,12 +211,28 @@ function BFS(){
     }else{
         return [false,null,null];
     }
-
-
 }
 
-function OutlinePathResidualNetwork(){
+function OutlinePathResidualNetwork(index_list){
+    for(let i=0;i<index_list.length-1;i++){
+        let str=index_list[i].toString()+":"+index_list[i+1].toString();
+        let g=edges[str];
+        g.item(0).setStroke("#006400");
+        g.item(1).setFill("#006400");
+        g.item(2).setFill("#006400");
+    }
+}
 
+function UpdateFlowMatrix(min_weight,index_list){
+
+    for(let i=0;i<index_list.length-1;i++){
+        if(flow_matrix[index_list[i]][index_list[i+1]]===-1){
+            flow_matrix[index_list[i+1]][index_list[i]]-=min_weight;
+        }else{
+            flow_matrix[index_list[i]][index_list[i+1]]+=min_weight;
+        }
+
+    }
 }
 
 function Handle(ins,b1,inp,canvas){
@@ -221,7 +253,7 @@ function Handle(ins,b1,inp,canvas){
         Handle(ins,b1,inp,canvas);
     }else if(step===6){
         b1.hide();
-        ins.text("Now add edges by connecting vertices. Select a vertex on canvas.")
+        ins.text("Now add edges by connecting vertices. Select a vertex as the starting point on canvas.")
         step=7;
     }else if(step===8){
         ins.text("Select another vertex where the edge points to.")
@@ -281,12 +313,16 @@ function Handle(ins,b1,inp,canvas){
             step=13;
         }
     }else if(step===13){
-        ins.text("Let's first construct a residual network. Initially, all the edges have flows of 0.");
+        ins.text("Let's construct a residual network (again). (Initially, all the edges have flows of 0.)");
         b1.text("Next");
         HandleCanvas(ins,b1,inp,canvas,null);
     }else if(step===14){
-        ins.text("Then we will apply BFS to search a path from S to T.");
+        ins.text("Then we will apply BFS to search a path from S to T. After finding a path, we update the flows add the minimum weight in the path to our maximum capacity.");
         HandleCanvas(ins,b1,inp,canvas,null);
+    }else if(step===16){
+        b1.hide();
+        ins.text("It looks like there is no such path from S to T. Hence we get our maximum capacity="+maximum_capacity.toString()+".")
+        step=17;
     }
 }
 
@@ -300,7 +336,6 @@ function HandleCanvas(ins,b1,inp,canvas,options){
             Handle(ins,b1,inp,canvas);
         }
     }else if(step===3){
-        console.log("I'm here");
         if(!options.target){
             let ptr=canvas.getPointer(options.e,true);
             AddVertex(canvas,ptr.x,ptr.y,"blue");
@@ -333,22 +368,24 @@ function HandleCanvas(ins,b1,inp,canvas,options){
             Handle(ins,b1,inp,canvas);
         }
     }else if(step===13){
-        canvas.remove(canvas.getObjects());
+        canvas.clear();
         DrawResidualNetwork(canvas);
         step=14;
     }else if(step===14){
         let result=BFS();
         if (result[0]===true){
-            console.log("min weight",result[1]);
-            for(let i=0;i<result[2].length;i++){
-                console.log(result[2][i]);
-            }
+            maximum_capacity+=result[1];
+            result[2].reverse();
+            OutlinePathResidualNetwork(result[2]);
+            canvas.renderAll();
+            UpdateFlowMatrix(result[1],result[2]);
+            step=13;
         }else{
-            console.log("Not found");
+            step=16;
         }
-        OutlinePathResidualNetwork();
+
     }
-    step=15;
+
 }
 function main() {
     let canvas = new fabric.Canvas("c",{selection:false});
