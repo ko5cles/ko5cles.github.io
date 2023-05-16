@@ -7,7 +7,10 @@ header{
     padding: 10px;
     font-size: 35px;
 }
-
+img{
+    width:75%;
+    object-fit: cover;
+}
 canvas {
     display: block;
     outline: black 3px solid;

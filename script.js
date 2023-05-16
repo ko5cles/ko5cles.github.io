@@ -317,7 +317,7 @@ function Handle(ins,b1,inp,canvas){
         b1.text("Next");
         HandleCanvas(ins,b1,inp,canvas,null);
     }else if(step===14){
-        ins.text("Then we will apply BFS to search a path from S to T. After finding a path, we update the flows add the minimum weight in the path to our maximum capacity.");
+        ins.text("Then we will apply BFS to search a path from S to T. After finding a path, we update the flows and add the minimum weight in the path to our maximum capacity.");
         HandleCanvas(ins,b1,inp,canvas,null);
     }else if(step===16){
         b1.hide();
