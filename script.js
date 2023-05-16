@@ -396,7 +396,7 @@ function main() {
     const b1=$("#b1");
     const inp=$("#input");
 
-    ins.text("Let's first create a graph.");
+    ins.text("Let's first create a graph on the canvas.");
     b1.text("OK");
     inp.hide();
 
