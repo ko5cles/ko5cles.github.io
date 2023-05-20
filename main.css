@@ -8,27 +8,46 @@ header{
     font-size: 35px;
 }
 img{
-    width:75%;
+    width:50%;
     object-fit: cover;
+    outline: black 2px dashed;
+    margin-left: 10px;
 }
-canvas {
-    display: block;
+#c {
     outline: black 3px solid;
 }
 
+#c1{
+    display: block;
+}
+
+#introduction{
+    outline: black 3px dashed;
+}
 .column {
     float: left;
     width: 50%;
     margin-bottom: 15px;
 }
 
-.subcolumn{
+.row{
     float: left;
-    width: 50%;
+    width: 100%;
+    margin-bottom: 15px;
 }
 
 .row:after {
     content: "";
     display: table;
     clear: both;
+}
+
+.input_container{
+    float: left;
+    width: 75%;
+}
+
+.button_container{
+    float: left;
+    width: 25%;
 }
