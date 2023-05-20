@@ -45,6 +45,9 @@ function AddVertex(canvas, x, y, color) {
 }
 
 function AddDirectedLine(canvas,coords,color,weight,position='up'){
+    if(typeof weight !=="string"){
+        weight=weight.toString();
+    }
     let ang;
     if(coords[1]===coords[3]){
         ang=90;
@@ -66,7 +69,7 @@ function AddDirectedLine(canvas,coords,color,weight,position='up'){
     });
     t.rotate(ang);
     if(position==='up'){
-        let text=new fabric.Text(weight.toString(),{
+        let text=new fabric.Text(weight,{
             fontSize:10,
             left:(coords[0]+coords[2])/2-5,
             top:(coords[1]+coords[3])/2-20,
@@ -79,7 +82,7 @@ function AddDirectedLine(canvas,coords,color,weight,position='up'){
         g.sendToBack();
         return g;
     }else{
-        let text=new fabric.Text(weight.toString(),{
+        let text=new fabric.Text(weight,{
             fontSize:10,
             left:(coords[0]+coords[2])/2+5,
             top:(coords[1]+coords[3])/2+15,
@@ -109,7 +112,8 @@ function AddRLine(canvas, coords, weight) {
 }
 
 function AddFLine(canvas, coords,flow,capacity){
-    AddDirectedLine(canvas,coords,"black",flow);
+    let str=flow.toString()+"/"+capacity.toString();
+    AddDirectedLine(canvas,coords,"black",str);
 }
 
 function ClearResidualMatrix() {
@@ -405,6 +409,8 @@ function HandleCanvas(ins, b1, inp, canvas, subcanvas, options) {
             }
         }
     } else if (step === 13) {
+        canvas.clear();
+        DrawFlowNetwork(canvas);
         subcanvas.clear();
         DrawResidualNetwork(subcanvas);
         step = 14;
