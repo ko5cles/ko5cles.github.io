@@ -58,31 +58,58 @@ li {
     justify-content: center;
     width: 100%;
     aspect-ratio: 1/0.25;
-    padding: 20px;
+    padding: 10px;
     border: 2px solid gray;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.project img{
-    width: 100%;
+.project div.photo{
+    width: 30%;
     aspect-ratio: 1/1;
-    padding: 5px;
 }
 
-.project text{
-    width: 60%;
-    padding: 20px;
+.project div.text{
+    width: 70%;
+}
+
+.project img{
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    padding: 5px;
 }
 
 .project div.title{
     font-size: 40px;
     font-weight: bold;
+    padding: 5px;
 }
 
 .project div.description{
     font-size: 20px;
+    padding: 5px;
 }
+
+.icon_banner{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+}
+.icon{
+    height: 100%;
+    aspect-ratio: 1/1;
+    padding: 10px;
+}
+.icon img{
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
 
 
 
