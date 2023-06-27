@@ -56,6 +56,8 @@ li {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    aspect-ratio: 1/0.25;
     padding: 20px;
     border: 2px solid gray;
     border-radius: 5px;
@@ -65,11 +67,11 @@ li {
 .project img{
     width: 100%;
     aspect-ratio: 1/1;
-    padding: 20px;
+    padding: 5px;
 }
 
 .project text{
-    width: 100%;
+    width: 60%;
     padding: 20px;
 }
 
