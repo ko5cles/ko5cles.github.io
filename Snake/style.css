@@ -1,0 +1,23 @@
+body {
+    font-size: 18px;
+    font-family: monospace;
+}
+.background{
+    width: 80vw;
+    display: block;
+    margin: auto;
+}
+.scoreboard{
+    width: 100%;
+    height: 10%;
+    border: black 3px solid;
+    font-size: 24px;
+}
+.playground{
+    width: 100%;
+    height: 90%;
+    border: black 3px solid;
+    display: grid;
+    padding: 0;
+    margin: 0;
+}

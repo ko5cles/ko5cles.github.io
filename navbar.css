@@ -1,0 +1,43 @@
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 15px;
+    background-color: white;
+    color: black;
+}
+
+.nav-links a {
+    color: black;
+}
+#logo{
+    width: 40px;
+    height: 40px;
+}
+.menu {
+    display: flex;
+    gap: 1em;
+    font-size: 20px;
+}
+
+.menu li {
+    padding: 15px 15px;
+}
+
+.menu li:hover {
+    background-color: gray;
+    border-radius: 5px;
+    transition: 0.3s ease;
+}
+
+.menu li a:hover{
+    color:white;
+}
