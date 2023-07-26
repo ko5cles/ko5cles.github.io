@@ -369,6 +369,20 @@ function main() {
         key_pressed = event.key;
     });
     // add touch screen support
+    document.addEventListener("click",(event)=>{
+        if (head_position !== null) {
+            let x = event.clientX, y = event.clientY;
+            let head_x = head_position["left"], head_y = head_position["top"];
+            if (cur_dir === "u" || cur_dir === "d") {
+                if (x < head_x) key_pressed = "a";
+                else if (x > head_x) key_pressed = "d";
+            } else if (cur_dir === "l" || cur_dir === "r") {
+                if (y > head_y) key_pressed = "s";
+                else if (y < head_y) key_pressed = "w";
+            }
+        }
+    })
+    /*
     $(window).click(function (event) {
         if (head_position !== null) {
             let x = event.clientX, y = event.clientY;
@@ -382,5 +396,5 @@ function main() {
             }
         }
     });
-
+     */
 }
