@@ -20,11 +20,19 @@ function AddStartButton() {
     return button;
 }
 
-function CreateGrid(width) {
+function CreateGrid(base) {
     let playgnd = document.getElementById("playground");
     const screen_width = screen.width * 0.8;
     const window_height = $(window).height() - 200;
-    const height = Math.floor(window_height * width / screen_width);
+    let width=null;
+    let height=null;
+    if(screen.width>screen.height){//horizontal
+        width=base;
+        height = Math.floor(window_height * width / screen_width);
+    }else{//vertical
+        height=base;
+        width=Math.floor(screen_width*height/window_height);
+    }
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             let cell = document.createElement("div");
@@ -36,29 +44,11 @@ function CreateGrid(width) {
     /* add css for grid*/
     $(".playground").css({"grid-template-columns": "repeat(" + width.toString() + ",1fr)"});
     $(".grid").css({"border": "black 2px solid", "aspect-ratio": "1/1"});
-    return height;
+    return [width,height];
 }
 
 function Location2String(location) {
     return "#" + location[0].toString() + "-" + location[1].toString();
-}
-
-function SetColor(location, type) {
-    let str = Location2String(location);
-    if (type === "h") $(str).css("background-color", "green");
-    else if (type === "b") $(str).css("background-color", "yellow");
-    else if (type === "t") $(str).css("background-color", "red");
-    else if (type === "f") $(str).css("background-color", "purple");
-    else if (type === "e") $(str).css("background-color", "white");
-    else console.log("color type error!");
-}
-
-function SetValue(location, type) {
-    if (type === "h") this.snake[location[0]][location[1]] = 1;
-    else if (type === "b") this.snake[location[0]][location[1]] = 2;
-    else if (type === "t") this.snake[location[0]][location[1]] = 3;
-    else if (type === "e") this.snake[location[0]][location[1]] = 0;
-    else console.log("value type error!");
 }
 
 class Game {
@@ -356,8 +346,8 @@ function CreateGame(width, height) {
 
 function PrepareGame() {
     $("#start_button").hide();
-    const width = 32;
-    const height = CreateGrid(width);
+    const base = 16;
+    const [width,height] = CreateGrid(base);
     CreateGame(width, height);
 }
 
@@ -382,19 +372,4 @@ function main() {
             }
         }
     })
-    /*
-    $(window).click(function (event) {
-        if (head_position !== null) {
-            let x = event.clientX, y = event.clientY;
-            let head_x = head_position["left"], head_y = head_position["top"];
-            if (cur_dir === "u" || cur_dir === "d") {
-                if (x < head_x) key_pressed = "a";
-                else if (x > head_x) key_pressed = "d";
-            } else if (cur_dir === "l" || cur_dir === "r") {
-                if (y > head_y) key_pressed = "s";
-                else if (y < head_y) key_pressed = "w";
-            }
-        }
-    });
-     */
 }
