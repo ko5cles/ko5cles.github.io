@@ -7,6 +7,8 @@ let update_interval = null;
 let key_pressed = null;
 let head_position = null;
 let cur_dir = null;
+let score = 155;
+let game = null;
 
 /* functions */
 function AddStartButton() {
@@ -22,16 +24,16 @@ function AddStartButton() {
 
 function CreateGrid(base) {
     let playgnd = document.getElementById("playground");
-    const screen_width = screen.width * 0.8;
+    const window_width = $(window).width() * 0.8;
     const window_height = $(window).height() - 200;
-    let width=null;
-    let height=null;
-    if(screen.width>screen.height){//horizontal
-        width=base;
-        height = Math.floor(window_height * width / screen_width);
-    }else{//vertical
-        height=base;
-        width=Math.floor(screen_width*height/window_height);
+    let width = null;
+    let height = null;
+    if (window.width > window.height) {//horizontal
+        width = base;
+        height = Math.floor(window_height * width / window_width);
+    } else {//vertical
+        height = base;
+        width = Math.floor(window_width * height / window_height);
     }
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
@@ -44,7 +46,7 @@ function CreateGrid(base) {
     /* add css for grid*/
     $(".playground").css({"grid-template-columns": "repeat(" + width.toString() + ",1fr)"});
     $(".grid").css({"border": "black 2px solid", "aspect-ratio": "1/1"});
-    return [width,height];
+    return [width, height];
 }
 
 function Location2String(location) {
@@ -56,18 +58,18 @@ class Game {
         this.width = width;
         this.height = height;
         this.snake = new Array(height).fill(0).map(() => new Array(width).fill(0));
-        this.head = [];
-        this.tail = [];
-        this.tail_dir = [];
         this.fruit = new Array(height).fill(0).map(() => new Array(width).fill(0));
-        this.fruit_gone = false;
-        this.just_ate = false;
-        this.score = 0;
-        this.game_over = false;
         this.Initialize();
     }
 
     Initialize() {
+        this.head = [];
+        this.tail = [];
+        this.tail_dir = [];
+        this.fruit_gone = false;
+        this.just_ate = false;
+        this.game_over = false;
+
         let head_column = Math.floor(this.width / 2);
         let head_row = Math.floor(this.height / 2);
         this.head = [head_row, head_column];
@@ -77,6 +79,16 @@ class Game {
         this.Set(this.head, "h"); /* 0 is empty, 1 is head, 2 is body, 3 is tail*/
         this.Set(this.tail, "t");
         this.SpawnFruit();
+    }
+
+    Reset() {
+        for (let i = 0; i < this.height; i++) {
+            for (let j = 0; j < this.width; j++) {
+                this.Clear([i, j], "h");
+                this.Clear([i, j], "f");
+            }
+        }
+        this.Initialize();
     }
 
     Set(location, type) {
@@ -143,7 +155,7 @@ class Game {
                 this.fruit_gone = true;
                 this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
                 this.just_ate = true;
-                this.score = this.score + 5;
+                score = score + 5;
             } else {
                 this.Set(this.head, "h");
             }
@@ -185,7 +197,7 @@ class Game {
                 this.fruit_gone = true;
                 this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
                 this.just_ate = true;
-                this.score = this.score + 5;
+                score = score + 5;
             } else {
                 this.Set(this.head, "h");
             }
@@ -227,7 +239,7 @@ class Game {
                 this.fruit_gone = true;
                 this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
                 this.just_ate = true;
-                this.score = this.score + 5;
+                score = score + 5;
             } else {
                 this.Set(this.head, "h");
             }
@@ -269,7 +281,7 @@ class Game {
                 this.fruit_gone = true;
                 this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
                 this.just_ate = true;
-                this.score = this.score + 5;
+                score = score + 5;
             } else {
                 this.Set(this.head, "h");
             }
@@ -298,7 +310,7 @@ class Game {
                 this.fruit_gone = false;
             }
 
-            $("#score").text(this.score);
+            $("#score").text(score);
 
             if (key_pressed === "ArrowUp" || key_pressed === "w") {
                 if (cur_dir === "d") {
@@ -333,33 +345,61 @@ class Game {
                 else if (cur_dir === "d") this.MoveDown();
             }
         } else {
+            console.log("i'm here in true")
             clearInterval(update_interval);
             update_interval = null;
+            LoadResultBoard();
         }
     }
 }
 
-function CreateGame(width, height) {
-    let game = new Game(width, height);
+function PrepareGame() {
+    $("#start_button").hide();
+    const base = 10;
+    const [width, height] = CreateGrid(base);
+    game = new Game(width, height);
     update_interval = setInterval(game.Update.bind(game), 500);
 }
 
-function PrepareGame() {
-    $("#start_button").hide();
-    const base = 16;
-    const [width,height] = CreateGrid(base);
-    CreateGame(width, height);
+function LoadResultBoard() {
+    let result_score = document.getElementById("result_score");
+    result_score.innerHTML = score;
+    if (score > 50) {
+        $("#crown_img_1").attr("src", "./assets/crown.png");
+    }
+    if (score > 100) {
+        $("#crown_img_2").attr("src", "./assets/crown.png");
+    }
+
+    if (score > 150) {
+        $("#crown_img_3").attr("src", "./assets/crown.png");
+    }
+    $(".result").css({"display": "grid", "visibility": "visible"});
+}
+
+function ResetGame() {
+    $(".result").css({"display": "none", "visibility": "hidden"});
+    //reset global variables
+    score = 0;
+    key_pressed = null;
+    head_position = null;
+    cur_dir = null;
+    //reset game
+    game.Reset();
+    update_interval = setInterval(game.Update.bind(game), 500);
 }
 
 function main() {
     let button = AddStartButton();
     button.addEventListener("click", PrepareGame);
+    let retry_button = document.getElementById("retry");
+    retry_button.addEventListener("click", ResetGame);
     // add keyboard support
     document.addEventListener("keydown", (event) => {
         key_pressed = event.key;
     });
     // add touch screen support
-    document.addEventListener("click",(event)=>{
+    document.addEventListener("click", (event) => {
         if (head_position !== null) {
             let x = event.clientX, y = event.clientY;
             let head_x = head_position["left"], head_y = head_position["top"];
