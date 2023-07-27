@@ -108,6 +108,7 @@ class Game {
         } else if (type === "s") {
             $(str).css("background-color", "orange");
             this.fruit[location[0]][location[1]] = 2;
+            this.snake[location[0]][location[1]] = 2;
         } else console.log("set type error!");
     }
 
@@ -363,14 +364,14 @@ function PrepareGame() {
 function LoadResultBoard() {
     let result_score = document.getElementById("result_score");
     result_score.innerHTML = score;
-    if (score > 50) {
+    if (score > 40) {
         $("#crown_img_1").attr("src", "./assets/crown.png");
     }
-    if (score > 100) {
+    if (score > 80) {
         $("#crown_img_2").attr("src", "./assets/crown.png");
     }
 
-    if (score > 150) {
+    if (score > 120) {
         $("#crown_img_3").attr("src", "./assets/crown.png");
     }
     $(".result").css({"display": "grid", "visibility": "visible"});

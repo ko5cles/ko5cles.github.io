@@ -54,7 +54,7 @@ body {
     grid-column-end: 2;
     grid-row-start: 3;
     grid-row-end: 4;
-    padding: 20px;
+    padding: 5px;
 
 }
 #crown_2{
@@ -62,14 +62,14 @@ body {
     grid-column-end: 3;
     grid-row-start: 3;
     grid-row-end: 4;
-    padding: 20px;
+    padding: 5px;
 }
 #crown_3{
     grid-column-start: 3;
     grid-column-end: 4;
     grid-row-start: 3;
     grid-row-end: 4;
-    padding: 20px;
+    padding: 5px;
 }
 .crown{
     max-width: 100%;
