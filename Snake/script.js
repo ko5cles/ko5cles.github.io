@@ -7,7 +7,7 @@ let update_interval = null;
 let key_pressed = null;
 let head_position = null;
 let cur_dir = null;
-let score = 155;
+let score = 0;
 let game = null;
 
 /* functions */
@@ -345,7 +345,6 @@ class Game {
                 else if (cur_dir === "d") this.MoveDown();
             }
         } else {
-            console.log("i'm here in true")
             clearInterval(update_interval);
             update_interval = null;
             LoadResultBoard();
@@ -384,6 +383,10 @@ function ResetGame() {
     key_pressed = null;
     head_position = null;
     cur_dir = null;
+    //reset crown image
+    $("#crown_img_1").attr("src", "./assets/crown-gray.png");
+    $("#crown_img_2").attr("src", "./assets/crown-gray.png");
+    $("#crown_img_3").attr("src", "./assets/crown-gray.png");
     //reset game
     game.Reset();
     update_interval = setInterval(game.Update.bind(game), 500);
