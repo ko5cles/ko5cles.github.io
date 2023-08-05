@@ -7,6 +7,8 @@ let update_interval = null;
 let key_pressed = null;
 let head_position = null;
 let cur_dir = null;
+let prev_dir = null;
+let dir = null;
 let score = 0;
 let game = null;
 
@@ -77,7 +79,7 @@ class Game {
         this.tail_dir.push("l");
 
         this.Set(this.head, "h"); /* 0 is empty, 1 is head, 2 is body, 3 is tail*/
-        this.Set(this.tail, "t");
+        this.Set(this.tail, "tl");
         this.SpawnFruit();
     }
 
@@ -94,19 +96,156 @@ class Game {
     Set(location, type) {
         let str = Location2String(location);
         if (type === "h") {
-            $(str).css("background-color", "green");
+            if (cur_dir === "u") $(str).css("background-image", "url('./assets/head.png')");
+            else if (cur_dir === "r") $(str).css({
+                "background-image": "url('./assets/head.png')",
+                "transform": "rotate(90deg)"
+            });
+            else if (cur_dir === "d") $(str).css({
+                "background-image": "url('./assets/head.png')",
+                "transform": "rotate(180deg)"
+            });
+            else if (cur_dir === "l" || cur_dir === null) $(str).css({
+                "background-image": "url('./assets/head.png')",
+                "transform": "rotate(270deg)"
+            });
+
             this.snake[location[0]][location[1]] = 1;
         } else if (type === "b") {
-            $(str).css("background-color", "yellow");
+            if (cur_dir === prev_dir) {
+                if (cur_dir === "u") $(str).css("background-image", "url('./assets/body.png')");
+                else if (cur_dir === "r") $(str).css({
+                    "background-image": "url('./assets/body.png')",
+                    "transform": "rotate(90deg)"
+                });
+                else if (cur_dir === "d") $(str).css({
+                    "background-image": "url('./assets/body.png')",
+                    "transform": "rotate(180deg)"
+                });
+                else if (cur_dir === "l") $(str).css({
+                    "background-image": "url('./assets/body.png')",
+                    "transform": "rotate(270deg)"
+                });
+            } else {
+                if (prev_dir === "l") {
+                    if (cur_dir === "u") $(str).css("background-image", "url('./assets/body-curve.png')");
+                    else if (cur_dir === "d") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(90deg)"
+                    });
+                } else if (prev_dir === "r") {
+                    if (cur_dir === "u") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(270deg)"
+                    });
+                    else if (cur_dir === "d") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(180deg)"
+                    });
+                } else if (prev_dir === "u") {
+                    if (cur_dir === "l") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(180deg)"
+                    });
+                    else if (cur_dir === "r") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(90deg)"
+                    });
+                } else if (prev_dir === "d") {
+                    if (cur_dir === "l") $(str).css({
+                        "background-image": "url('./assets/body-curve.png')",
+                        "transform": "rotate(270deg)"
+                    });
+                    else if (cur_dir === "r") $(str).css("background-image", "url('./assets/body-curve.png')");
+                }
+            }
+
             this.snake[location[0]][location[1]] = 2;
-        } else if (type === "t") {
-            $(str).css("background-color", "red");
+        } else if(type==="bf"){ // body is full
+            if (cur_dir === prev_dir) {
+                if (cur_dir === "u") $(str).css("background-image", "url('./assets/body-full.png')");
+                else if (cur_dir === "r") $(str).css({
+                    "background-image": "url('./assets/body-full.png')",
+                    "transform": "rotate(90deg)"
+                });
+                else if (cur_dir === "d") $(str).css({
+                    "background-image": "url('./assets/body-full.png')",
+                    "transform": "rotate(180deg)"
+                });
+                else if (cur_dir === "l") $(str).css({
+                    "background-image": "url('./assets/body-full.png')",
+                    "transform": "rotate(270deg)"
+                });
+            } else {
+                if (prev_dir === "l") {
+                    if (cur_dir === "u") $(str).css("background-image", "url('./assets/body-curve-full.png')");
+                    else if (cur_dir === "d") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(90deg)"
+                    });
+                } else if (prev_dir === "r") {
+                    if (cur_dir === "u") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(270deg)"
+                    });
+                    else if (cur_dir === "d") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(180deg)"
+                    });
+                } else if (prev_dir === "u") {
+                    if (cur_dir === "l") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(180deg)"
+                    });
+                    else if (cur_dir === "r") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(90deg)"
+                    });
+                } else if (prev_dir === "d") {
+                    if (cur_dir === "l") $(str).css({
+                        "background-image": "url('./assets/body-curve-full.png')",
+                        "transform": "rotate(270deg)"
+                    });
+                    else if (cur_dir === "r") $(str).css("background-image", "url('./assets/body-curve-full.png')");
+                }
+            }
+
+            this.snake[location[0]][location[1]] = 2;
+
+        } else if (type[0] === "t") {
+            if (type[1] === "u") $(str).css("background-image", "url('./assets/tail.png')");
+            else if (type[1] === "r") $(str).css({
+                "background-image": "url('./assets/tail.png')",
+                "transform": "rotate(90deg)"
+            });
+            else if (type[1] === "d") $(str).css({
+                "background-image": "url('./assets/tail.png')",
+                "transform": "rotate(180deg)"
+            });
+            else if (type[1] === "l") $(str).css({
+                "background-image": "url('./assets/tail.png')",
+                "transform": "rotate(270deg)"
+            });
+
             this.snake[location[0]][location[1]] = 3;
         } else if (type === "f") {
-            $(str).css("background-color", "purple");
+            $(str).css("background-image", "url('./assets/star.png')");
             this.fruit[location[0]][location[1]] = 1;
         } else if (type === "s") {
-            $(str).css("background-color", "orange");
+            if (cur_dir === "u") $(str).css("background-image", "url('./assets/head-heart.png')");
+            else if (cur_dir === "r") $(str).css({
+                "background-image": "url('./assets/head-heart.png')",
+                "transform": "rotate(90deg)"
+            });
+            else if (cur_dir === "d") $(str).css({
+                "background-image": "url('./assets/head-heart.png')",
+                "transform": "rotate(180deg)"
+            });
+            else if (cur_dir === "l" || cur_dir === null) $(str).css({
+                "background-image": "url('./assets/head-heart.png')",
+                "transform": "rotate(270deg)"
+            });
+
             this.fruit[location[0]][location[1]] = 2;
             this.snake[location[0]][location[1]] = 2;
         } else console.log("set type error!");
@@ -115,10 +254,10 @@ class Game {
     Clear(location, type) {
         let str = Location2String(location);
         if (type === "t" || type === "b" || type === "h") {
-            $(str).css("background-color", "white");
+            $(str).css({"background-color": "white", "background-image": "none", "transform": "none"});
             this.snake[location[0]][location[1]] = 0;
         } else if (type === "f") {
-            $(str).css("background-color", "white");
+            $(str).css({"background-image": "none","transform":"none"});
             this.fruit[location[0]][location[1]] = 0;
         } else console.log("clear type error!");
     }
@@ -135,17 +274,42 @@ class Game {
         this.Set([row_number, column_number], "f");
     }
 
-    MoveLeft() {
-        let head_target = [this.head[0], this.head[1] - 1];
-        if (head_target[1] === -1) {/* hit the wall */
-            this.game_over = true;
-        } else if (this.snake[head_target[0]][head_target[1]] !== 0) {/* hit body */
+    Move(mov_dir) {
+        let head_target;
+        if (mov_dir === "l") {
+            head_target = [this.head[0], this.head[1] - 1];
+            if (head_target[1] === -1) {/* hit the wall */
+                this.game_over = true;
+            }
+        } else if (mov_dir === "r") {
+            head_target = [this.head[0], this.head[1] + 1];
+            if (head_target[1] === this.width) {/* hit the wall */
+                this.game_over = true;
+            }
+        } else if (mov_dir === "u") {
+            head_target = [this.head[0] - 1, this.head[1]];
+            if (head_target[0] === -1) {/* hit the wall */
+                this.game_over = true;
+            }
+        } else if (mov_dir === "d") {
+            head_target = [this.head[0] + 1, this.head[1]];
+            if (head_target[0] === this.height) {/* hit the wall */
+                this.game_over = true;
+            }
+        }
+
+        if (this.game_over === true) return; // hit the wall
+
+        if (this.snake[head_target[0]][head_target[1]] !== 0) {/* hit body */
             this.game_over = true;
         } else {
             // head
             if (this.just_ate === true) {
                 this.just_ate = false;
+                this.Clear(this.head,"h");
+                this.Set(this.head,"bf");
             } else {
+                this.Clear(this.head, "h");
                 this.Set(this.head, "b");
             }
             this.head = head_target;
@@ -160,152 +324,37 @@ class Game {
             } else {
                 this.Set(this.head, "h");
             }
-            this.tail_dir.push("l");
-            cur_dir = "l";
+
+            if (mov_dir === "l") {
+                this.tail_dir.push("l");
+            } else if (mov_dir === "r") {
+                this.tail_dir.push("r");
+            } else if (mov_dir === "u") {
+                this.tail_dir.push("u");
+            } else if (mov_dir === "d") {
+                this.tail_dir.push("d");
+            }
+
             // tail
             if (this.fruit[this.tail[0]][this.tail[1]] === 2) { // tail meets fruit to digest
                 this.Clear(this.tail, "f");
-                this.Set(this.tail, "t");
+                this.Set(this.tail, "t" + this.tail_dir[0]);
             } else {
-                let dir = this.tail_dir.shift();
+                dir = this.tail_dir.shift();
                 this.Clear(this.tail, "t");
                 if (dir === "l") this.tail = [this.tail[0], this.tail[1] - 1];
                 else if (dir === "r") this.tail = [this.tail[0], this.tail[1] + 1];
                 else if (dir === "u") this.tail = [this.tail[0] - 1, this.tail[1]];
                 else if (dir === "d") this.tail = [this.tail[0] + 1, this.tail[1]];
-                this.Set(this.tail, "t");
-            }
-        }
-    }
-
-    MoveRight() {
-        let head_target = [this.head[0], this.head[1] + 1];
-        if (head_target[1] === this.width) {/* hit the wall */
-            this.game_over = true;
-        } else if (this.snake[head_target[0]][head_target[1]] !== 0) {/* hit body */
-            this.game_over = true;
-        } else {
-            // head
-            if (this.just_ate === true) {
-                this.just_ate = false;
-            } else {
-                this.Set(this.head, "b");
-            }
-            this.head = head_target;
-            head_position = $(Location2String(this.head)).offset();
-
-            if (this.fruit[head_target[0]][head_target[1]] === 1) { // assume only 1 fruit on map
-                this.fruit_gone = true;
-                this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
-                this.just_ate = true;
-                score = score + 5;
-            } else {
-                this.Set(this.head, "h");
-            }
-            this.tail_dir.push("r");
-            cur_dir = "r";
-            // tail
-            if (this.fruit[this.tail[0]][this.tail[1]] === 2) { // tail meets fruit to digest
-                this.Clear(this.tail, "f");
-                this.Set(this.tail, "t");
-            } else {
-                let dir = this.tail_dir.shift();
-                this.Clear(this.tail, "t");
-                if (dir === "l") this.tail = [this.tail[0], this.tail[1] - 1];
-                else if (dir === "r") this.tail = [this.tail[0], this.tail[1] + 1];
-                else if (dir === "u") this.tail = [this.tail[0] - 1, this.tail[1]];
-                else if (dir === "d") this.tail = [this.tail[0] + 1, this.tail[1]];
-                this.Set(this.tail, "t");
-            }
-        }
-    }
-
-    MoveUp() {
-        let head_target = [this.head[0] - 1, this.head[1]];
-        if (head_target[0] === -1) {/* hit the wall */
-            this.game_over = true;
-        } else if (this.snake[head_target[0]][head_target[1]] !== 0) {/* hit body */
-            this.game_over = true;
-        } else {
-            // head
-            if (this.just_ate === true) {
-                this.just_ate = false;
-            } else {
-                this.Set(this.head, "b");
-            }
-            this.head = head_target;
-            head_position = $(Location2String(this.head)).offset();
-
-            if (this.fruit[head_target[0]][head_target[1]] === 1) { // assume only 1 fruit on map
-                this.fruit_gone = true;
-                this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
-                this.just_ate = true;
-                score = score + 5;
-            } else {
-                this.Set(this.head, "h");
-            }
-            this.tail_dir.push("u");
-            cur_dir = "u";
-            // tail
-            if (this.fruit[this.tail[0]][this.tail[1]] === 2) { // tail meets fruit to digest
-                this.Clear(this.tail, "f");
-                this.Set(this.tail, "t");
-            } else {
-                let dir = this.tail_dir.shift();
-                this.Clear(this.tail, "t");
-                if (dir === "l") this.tail = [this.tail[0], this.tail[1] - 1];
-                else if (dir === "r") this.tail = [this.tail[0], this.tail[1] + 1];
-                else if (dir === "u") this.tail = [this.tail[0] - 1, this.tail[1]];
-                else if (dir === "d") this.tail = [this.tail[0] + 1, this.tail[1]];
-                this.Set(this.tail, "t");
-            }
-        }
-    }
-
-    MoveDown() {
-        let head_target = [this.head[0] + 1, this.head[1]];
-        if (head_target[0] === this.height) {/* hit the wall */
-            this.game_over = true;
-        } else if (this.snake[head_target[0]][head_target[1]] !== 0) {/* hit body */
-            this.game_over = true;
-        } else {
-            // head
-            if (this.just_ate === true) {
-                this.just_ate = false;
-            } else {
-                this.Set(this.head, "b");
-            }
-            this.head = head_target;
-            head_position = $(Location2String(this.head)).offset();
-
-            if (this.fruit[head_target[0]][head_target[1]] === 1) { // assume only 1 fruit on map
-                this.fruit_gone = true;
-                this.Set(this.head, "s"); // 0 empty, 1 fruit, 2 to digest
-                this.just_ate = true;
-                score = score + 5;
-            } else {
-                this.Set(this.head, "h");
-            }
-            this.tail_dir.push("d");
-            cur_dir = "d";
-            // tail
-            if (this.fruit[this.tail[0]][this.tail[1]] === 2) { // tail meets fruit to digest
-                this.Clear(this.tail, "f");
-                this.Set(this.tail, "t");
-            } else {
-                let dir = this.tail_dir.shift();
-                this.Clear(this.tail, "t");
-                if (dir === "l") this.tail = [this.tail[0], this.tail[1] - 1];
-                else if (dir === "r") this.tail = [this.tail[0], this.tail[1] + 1];
-                else if (dir === "u") this.tail = [this.tail[0] - 1, this.tail[1]];
-                else if (dir === "d") this.tail = [this.tail[0] + 1, this.tail[1]];
-                this.Set(this.tail, "t");
+                this.Clear(this.tail, "b");
+                this.Set(this.tail, "t" + this.tail_dir[0]);
             }
         }
     }
 
     Update() {
         if (this.game_over === false) {
+            prev_dir = cur_dir;
             if (this.fruit_gone === true) {
                 this.SpawnFruit();
                 this.fruit_gone = false;
@@ -314,37 +363,46 @@ class Game {
             $("#score").text(score);
 
             if (key_pressed === "ArrowUp" || key_pressed === "w") {
-                if (cur_dir === "d") {
-                    this.MoveDown();
+                if (prev_dir === "d") {
+                    cur_dir = "d";
                 } else {
-                    this.MoveUp();
+                    cur_dir = "u";
                 }
             } else if (key_pressed === "ArrowDown" || key_pressed === "s") {
-                if (cur_dir === "u") {
-                    this.MoveUp();
+                if (prev_dir === "u") {
+                    cur_dir = "u";
                 } else {
-                    this.MoveDown();
+                    cur_dir = "d";
                 }
             } else if (key_pressed === "ArrowLeft" || key_pressed === "a") {
-                if (cur_dir === "r") {
-                    this.MoveRight();
+                if (prev_dir === "r") {
+                    cur_dir = "r";
                 } else {
-                    this.MoveLeft();
+                    cur_dir = "l";
                 }
             } else if (key_pressed === "ArrowRight" || key_pressed === "d") {
-                if (cur_dir === "l") {
-                    this.MoveLeft();
+                if (prev_dir === "l") {
+                    cur_dir = "l";
                 } else {
-                    this.MoveRight();
+                    cur_dir = "r";
                 }
             } else if (key_pressed === null) {
-                this.MoveLeft();
-            } else {
-                if (cur_dir === "l") this.MoveLeft();
-                else if (cur_dir === "r") this.MoveRight();
-                else if (cur_dir === "u") this.MoveUp();
-                else if (cur_dir === "d") this.MoveDown();
+                if (prev_dir === null) {
+                    cur_dir = "l";
+                } else {
+                    if (prev_dir === "l") {
+                        cur_dir = "l";
+                    } else if (prev_dir === "r") {
+                        cur_dir = "r";
+                    } else if (prev_dir === "u") {
+                        cur_dir = "u";
+                    } else if (prev_dir === "d") {
+                        cur_dir = "d";
+                    }
+                }
             }
+            this.Move(cur_dir);
+            key_pressed = null;
         } else {
             clearInterval(update_interval);
             update_interval = null;
@@ -384,6 +442,8 @@ function ResetGame() {
     key_pressed = null;
     head_position = null;
     cur_dir = null;
+    prev_dir = null;
+    dir = null;
     //reset crown image
     $("#crown_img_1").attr("src", "./assets/crown-gray.png");
     $("#crown_img_2").attr("src", "./assets/crown-gray.png");
