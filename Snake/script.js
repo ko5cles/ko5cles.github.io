@@ -13,17 +13,6 @@ let score = 0;
 let game = null;
 
 /* functions */
-function AddStartButton() {
-    let button = document.createElement("button");
-    button.setAttribute("id", "start_button");
-    button.innerText = "START";
-    let playgnd = document.getElementById("playground");
-    playgnd.appendChild(button);
-    /* add css for button*/
-    $("#start_button").css({"font-size": "32px", "font-family": "monospace"})
-    return button;
-}
-
 function CreateGrid(base) {
     let playgnd = document.getElementById("playground");
     const window_width = $(window).width() * 0.8;
@@ -161,7 +150,7 @@ class Game {
             }
 
             this.snake[location[0]][location[1]] = 2;
-        } else if(type==="bf"){ // body is full
+        } else if (type === "bf") { // body is full
             if (cur_dir === prev_dir) {
                 if (cur_dir === "u") $(str).css("background-image", "url('./assets/body-full.png')");
                 else if (cur_dir === "r") $(str).css({
@@ -257,7 +246,7 @@ class Game {
             $(str).css({"background-color": "white", "background-image": "none", "transform": "none"});
             this.snake[location[0]][location[1]] = 0;
         } else if (type === "f") {
-            $(str).css({"background-image": "none","transform":"none"});
+            $(str).css({"background-image": "none", "transform": "none"});
             this.fruit[location[0]][location[1]] = 0;
         } else console.log("clear type error!");
     }
@@ -306,8 +295,8 @@ class Game {
             // head
             if (this.just_ate === true) {
                 this.just_ate = false;
-                this.Clear(this.head,"h");
-                this.Set(this.head,"bf");
+                this.Clear(this.head, "h");
+                this.Set(this.head, "bf");
             } else {
                 this.Clear(this.head, "h");
                 this.Set(this.head, "b");
@@ -412,7 +401,7 @@ class Game {
 }
 
 function PrepareGame() {
-    $("#start_button").hide();
+    $(".start").css({"display": "none", "visibility": "hidden"});
     const base = 10;
     const [width, height] = CreateGrid(base);
     game = new Game(width, height);
@@ -454,7 +443,8 @@ function ResetGame() {
 }
 
 function main() {
-    let button = AddStartButton();
+    $(".start").css({"display": "block", "visibility": "visible"});
+    let button = document.getElementById("start_button");
     button.addEventListener("click", PrepareGame);
     let retry_button = document.getElementById("retry");
     retry_button.addEventListener("click", ResetGame);
