@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lyric Writer</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="../navbar.css">
+</head>
+<body>
+
+<!-- navbar begins here-->
+<nav class="navbar">
+    <div class="logo"><img src="../assets/logo.JPG" id="logo" alt="logo"></div>
+    <!-- menu -->
+    <ul class="menu">
+            <li><a href="../index.html">Projects></a></li>
+            <li><a href="">Lyric Writer</a></li>
+    </ul>
+</nav>
+
+<header>
+    AI Lyric Writer
+</header>
+
+<article>
+    <section>
+        <h1>Introduction</h1>
+        <p>
+            The application is hosted on my <a href="https://huggingface.co/spaces/ko5cles/lyric_writer">Hugging-Face Space</a>.
+            The jupyter notebooks used can be found on my <a href="https://github.com/ko5cles/lyric_writer">GitHub</a>.
+            Please note that the code is under the MIT licence.
+        </p>
+        <p>
+            In the following sections, I'm going to explain what I have done, what problems I have met, and how I solved them.
+        </p>
+    </section>
+
+    <section>
+        <h1>Overview</h1>
+        <p>
+            The model uses the original transformer model described in the <a href="https://arxiv.org/abs/1706.03762">"Attention Is All You Need"</a> paper
+            and is trained using pop song lyrics gathered online.
+        </p>
+    </section>
+
+    <section>
+        <h1> Gathering Corpus </h1>
+        <p>
+            The notebook used to gather the corpus is named "Corpus.ipynb" in the GitHub repo,
+            or you can open it in <a href="https://colab.research.google.com/drive/1VFN8rABWTGIPWoV0x8nCom4vzTcQ9M1y?usp=sharing">Google Colab</a>.
+        </p>
+        <p>
+            As you know, the Internet is a chaotic place. Web pages are not organized in a uniform way. What's worse, almost all lyrics are copyright protected,
+            which means lyric provider APIs don't provide lyrics. These factors make web scraping difficult.
+        </p>
+        <p>
+            Luckily, Wikipedia seems to be more structured.
+            In order to gather song names by an artist, I download Wikipedia pages and use <a href="https://pypi.org/project/beautifulsoup4/">Beautiful Soup</a> to parse the page and search for specific elements.
+            Then I use <a href="https://lyricsgenius.readthedocs.io/en/master/">LyricsGenius</a> to get lyrics for each song.
+            In order to use it, a <a href="https://genius.com/api-clients">Genius API access token</a> is needed.
+            The reason that I did these steps separately is that the http connection provided by Genius is very limited in time.
+        </p>
+        <p>
+            However, a lot of weird things are embedded in these lyrics—for example, the following line. We need to get rid of them.
+        </p>
+        <div class="text">
+            "See Taylor Swift Live.Get tickets as low as $112.You might also like"
+        </div>
+        <p>
+            After doing that, the total <a href="https://github.com/ko5cles/lyric_writer/blob/main/clean_lyrics_without_parenthese.txt">training file</a> size is  2.1 MB, which consists of 969 pop songs.
+        </p>
+        <p>
+            How to prepare these data into training sets is the first major problem. Since I use the transformer architecture, the dataset should be prepared as inputs, teacher forcing, and target outputs.
+            So initially, I pair every two subsequent sentences, add "sol" to the start of the first sentence as the input, add "sol" to the start of the second sentence as teacher forcing,
+            and add "eol" to the end of the second sentence as the desired output. I used the set to train a simpler model with only 4 layers on each side.
+            The model's training accuracy turned out to be consistently low, which could mean two things: the learning rate is too large so that the model is not learning anything,
+            or the model architecture is too simple to capture the complexity. After I adjusted the learning rate to 1e-5, the training accuracy was still low.
+            So, the reason is probably that the lyrics are too complicated to be modeled.
+        </p>
+        <p>
+            Therefore, I took a look at the lyrics and found some possible reasons:
+        </p>
+        <div class="lyric">
+            [Verse 1]<br>
+            Why do you look so good in those jeans?<br>
+            Why'd you come around me with an ass like that?<br>
+            You're makin' all my thoughts obscene<br>
+            This is not, not like me<br>
+            Why you keep on texting me like that? (Damn)<br>
+            Got other things I need my mind on, yeah<br>
+            Other responsibilities<br>
+            This is not, not like me<br>
+            <br>
+            [Chorus]<br>
+            Why did you do that, do that, do that, do that<br>
+            Do that to me?<br>
+            Why did you do that, do that, do that, do that<br>
+            Do that to me?<br>
+            Why did you do that, do that, do that, do that<br>
+            Do that to me?<br>
+            Why did you do that?<br>
+            Why did you do that?<br>
+        </div>
+        <p>
+            The above lyrics are from <em>"Why did you do that"</em> by Lady Gaga. In a pop song, each section is structured very differently.
+            In verses, the lyrics are more diverse. On the contrary, in choruses, the lyrics are often repeated.
+            Since they are approximately proportioned in a song, and I didn't provide this information to the transformer,
+            the transformer may be confused about when to repeat and when to write new lines.
+            Therefore, only the first appearance is preserved if a lyric repeats itself several times during cleaning.
+        </p>
+        <div class="lyric">
+            [Pre-Chorus]<br>
+            But I keep cruisin'<br>
+            Can't stop, won't stop groovin'<br>
+            It's like I got this music in my mind<br>
+            Sayin', "It's gonna be alright"<br>
+        </div>
+        <p>
+            The above lyrics are from <em>"Shake it off"</em> by Taylor Swift.
+            We can see the logic relevance between line1 and line2, and that between line3 and line4 are strong.
+            But the relevance between line2 and line3 is weak. Therefore, it is inappropriate for me to group line2 and line3 together for training.
+            This is not always the case, though: sometimes, line1,2&3 are logically grouped together.
+            But for simplicity reasons, I only use pairs of distinct lyrics in my training.
+        </p>
+        <div class="lyric">
+            [Chorus]<br>
+            Like the girls you loved before (Ooh)<br>
+            Made you the one I've fallen for<br>
+            Every dead-end street (Dead-end street) led you straight to me (Straight to me)<br>
+            Now you're all I need (All I need), I'm so thankful for<br>
+            All of the girls you loved before<br>
+            But I love you more<br>
+        </div>
+        <p>
+            The above lyrics are from <em>"All Of The Girls You Loved Before"</em> by Taylor Swift.
+            In pop songs, there are often harmony words in parentheses.
+            In this implementation, I simply use a text vectorization layer, which will remove all punctuations, to tokenize the lyrics.
+            Without this context, the transformer may be confused about English grammar.
+            So, as an easy solution, I removed content inside parentheses altogether.
+        </p>
+    </section>
+
+    <section>
+        <h1>Training the Model</h1>
+        <p>
+            The notebook used for training the model is named "lyric_writer.ipynb" in the GitHub repo, or you can open it in <a href="https://colab.research.google.com/drive/1WpyUukactau7ngvH7YINH_DGXtIeMA04?usp=sharing"> Google Colab</a>.
+        </p>
+        <p>
+            As mentioned above, this implementation uses the original transformer architecture.
+            It composes of 12 stacked encoder layers and decoder layers. The embedding size for each word is 256; the first layer size of the feed forward network is 512;
+            the number of heads used in multi-head attention layer is 8; a dropout rate of 0.1 is also applied.
+        </p>
+        <p>
+            The major problem with training this model is coming up with the hyperparameters for the model to gradually converge.
+            I started with 4 stacked layers as with neural machine translation and 128 embedding size and gradually increased it to the current size.
+            The other issue is the learning rate. There were various cases where it looked like the model was going to converge but suddenly diverged.
+            Clearly, the learning rate with probably too small for the initial steps and too large for the ending steps.
+        </p>
+        <div class="figure">
+            <img src="figures/learning_rate_plot.png" alt="learning rate comparison"><br>
+            fig1. Learning rate comparison between the original paper and the implemented one.
+        </div>
+        <p>
+            The adjusted learning rate is showed in the above figure. The gradients from training are probably less stable in their directions.
+        </p>
+        <p>
+            I also want to show you some interesting moments while training the model.
+            These are the results generated by the model at different accuracy rates.
+        </p>
+        <p>
+            When the accuracy rate is about 20%:
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> Been a [UNK] [UNK] im a [UNK]
+        </div>
+        <p>
+            When the accuracy rate is about 35%:
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> im talking fear fear that im talking
+        </div>
+        <p>
+            When the accuracy rate is about 57% (this is my personal favorite):
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> been gettin gettin gettin high now
+        </div>
+        <p>
+            When the accuracy rate is about 75%:
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> dont make moves like im gonna dance
+        </div>
+        <p>
+            When the accuracy rate is about 85% (starts to memorize):
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> been saying yes instead of no
+        </div>
+        <p>
+            And eventually about 90%:
+        </p>
+        <div class="code">
+            print(Punchline("I'm doing good I'm on some new shit"))<br>
+            >>> been saying yes instead of no
+        </div>
+        <p>
+            I also tried a lot of other inputs and got a lot of interesting generated lines. Eventually, I used the model with 85% accuracy.
+            I'll save some fun if you want to <a href="https://huggingface.co/spaces/ko5cles/lyric_writer">try it here</a>.
+            I had no expectations before doing this, and I have to say I'm surprised by the generated content,
+            especially when the training file is so small. I'm also motivated by this, and I'll share what I'm doing now in the section below.
+        </p>
+
+    </section>
+
+    <section>
+        <h1>Future Improvements</h1>
+        <h2> Unsupervised Pretraining</h2>
+        <p>
+            The model has no prior knowledge about the English language. The labeled training file used is only 2.1 MB,
+            so it will be hard for the model to learn about the language.
+            In addition, compared to everyday speaking and writing, lyrics (at least some of them) are more abstract (metaphors, etc.).
+            So, it will be even harder for the model to perform well.
+        </p>
+        <p>
+            I'm working on the pretraining technique used in the <a href="https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf">GPT paper</a>,
+            and I'm trying to determine which language modeling task is ideal for this application.
+        </p>
+        <h2>
+            Tokenization by Semantic Aggregation
+        </h2>
+        <p>
+            The tokenization technique used in this implementation is very fundamental.
+            For example, "gettin'" and "getting" are mapped to different tokens. These abbreviations can be solved by hand-coding abbreviation rules.
+            However, "automobile" and "car" are also mapped to different tokens.
+            It is intuitive that if similar things are tokenized the same or similar, the attention mechanism will transform these words into embeddings more easily.
+            I tried prefix, root word, and suffix methods as in the Bert architecture. But I think English is somehow phonetic,
+            so similar concepts such as "apple" and "pears" look very different from each other. On the other hand, Chinese is less (or not at all) phonetic.
+            Apples("苹果") and pears("梨子") look kind of similar (they both have the "木" part, and "艹" is related to "木").
+            I happen to be a native Chinese speaker, so I'm thinking about doing semantic aggregation with Chinese and converting them to English.
+        </p>
+    </section>
+    <section>
+        <h1> Postscript</h1>
+        <p>
+            If you have read toward the end of this, I want you to know that I'm really intrigued by artificial intelligence and want to start a career with it.
+            Also, I'm very intelligent(an outlier, if I'm being honest 😂) and capable of self-learning.
+        </p>
+    </section>
+</article>
+
+
+</body>
+</html>

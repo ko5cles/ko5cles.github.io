@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="navbar.css">
     <script src="jquery-3.7.0.min.js"></script>
     <script src="script.js"></script>
     <title>Blog-ish</title>
@@ -13,16 +14,34 @@
 <body>
 <!-- navbar begins here-->
 <nav class="navbar">
-    <div class="logo"><img src="assets/logo.JPG" alt="logo"></div>
+    <div class="logo"><img src="assets/logo.JPG" id="logo" alt="logo"></div>
     <!-- menu -->
-    <ul class="nav-links">
-        <div class="menu">
-            <li><a href="">Projects</a></li>
-            <li><a href="interests.html">Interests</a></li>
-            <li><a href="about.html">About</a></li>
-        </div>
+    <ul class="menu">
+        <li><a href="">Projects</a></li>
+        <li><a href="interests.html">Interests</a></li>
+        <li><a href="about.html">About</a></li>
     </ul>
 </nav>
+
+<!-- projects begins here-->
+<div class="project" onclick="location.href='LyricWriter/index.html'">
+    <div class="photo">
+        <img src="assets/LyricWriter.gif" alt="project picture">
+    </div>
+    <div class="text">
+        <div class="title">
+            AI Lyric Writer
+        </div>
+        <div class="description">
+            Sep 13th, 2023<br><br>
+            This is a lyric generator built with deep learning.
+            Provided with a line, the generator will write a subsequent line in the pop-song manner.
+            The lyrics, trained on a 2.1MB file, almost make sense.
+            It turns out that general-purpose language modeling is a lot more complicated than I thought,
+            but I want to share some interesting partial results so far.
+        </div>
+    </div>
+</div>
 
 <div class="project" onclick="location.href='Algo2/index.html'">
     <div class="photo">

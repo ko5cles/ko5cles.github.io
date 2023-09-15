@@ -1,0 +1,78 @@
+*{
+    box-sizing: border-box;
+}
+
+body {
+    font-size: 18px;
+    font-family: monospace;
+}
+
+header{
+    text-align: center;
+    padding: 10px;
+    font-size: 35px;
+}
+
+h1{
+    font-size: 28px;
+}
+
+p{
+    text-indent: 46px;
+    padding: 5px;
+}
+
+section{
+    padding: 5px;
+    margin:auto;
+    max-width: 1200px;
+    border: 2px solid lightgray;
+    border-radius: 5px;
+}
+
+section a{
+    text-decoration: none;
+    color: royalblue;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+section a:hover{
+    cursor: pointer;
+    background-color: royalblue;
+    color: white;
+}
+
+.text{
+    font-family: sans-serif;
+    border-radius: 5px;
+    background-color: lightgray;
+    margin-left: 46px;
+    text-indent: 46px;
+    padding: 5px;
+}
+.lyric{
+    font-family: sans-serif;
+    border-radius: 5px;
+    background-color: lightgreen;
+    margin-left: 46px;
+    padding: 5px;
+}
+
+.figure{
+    font-family: sans-serif;
+    font-size: 16px;
+    background-color: white;
+    border: lightgray 2px solid;
+    border-radius: 2px;
+    display: grid;
+    justify-content: center;
+}
+
+.code{
+    font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, sans-serif;
+    border-radius: 5px;
+    background-color: lavender;
+    margin-left: 46px;
+    padding: 5px;
+}
