@@ -147,14 +147,14 @@
         </p>
         <p>
             As mentioned above, this implementation uses the original transformer architecture.
-            It composes of 12 stacked encoder layers and decoder layers. The embedding size for each word is 256; the first layer size of the feed forward network is 512;
-            the number of heads used in multi-head attention layer is 8; a dropout rate of 0.1 is also applied.
+            It is composed of 12 stacked encoder layers and decoder layers. The embedding size for each word is 256; the first layer size of the feed-forward network is 512;
+            the number of heads used in the multi-head attention layer is 8; a dropout rate of 0.1 is also applied.
         </p>
         <p>
             The major problem with training this model is coming up with the hyperparameters for the model to gradually converge.
-            I started with 4 stacked layers as with neural machine translation and 128 embedding size and gradually increased it to the current size.
+            I started with 4 stacked layers as with neural machine translation and 128 as the word embedding size and gradually increased it to the current size.
             The other issue is the learning rate. There were various cases where it looked like the model was going to converge but suddenly diverged.
-            Clearly, the learning rate with probably too small for the initial steps and too large for the ending steps.
+            Clearly, the learning rate was probably too small for the initial steps and too large for the ending steps.
         </p>
         <div class="figure">
             <img src="figures/learning_rate_plot.png" alt="learning rate comparison"><br>
