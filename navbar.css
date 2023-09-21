@@ -1,4 +1,4 @@
-*{
+* {
     box-sizing: border-box;
 }
 
@@ -15,18 +15,18 @@ li {
     height: 80px;
 }
 
-.logo{
+.logo {
     height: 100%;
     aspect-ratio: 1/1;
 }
 
-#logo {
+.logo img {
     width: 100%;
     height: 100%;
     object-fit: fill;
 }
 
-.menu {
+.navbar .menu {
     display: flex;
     gap: 1em;
     font-size: 20px;
@@ -49,4 +49,54 @@ li {
 
 .menu li a:hover {
     color: white;
+}
+
+.mobile-navbar {
+    display: none;
+}
+
+@media screen and (max-width: 1200px) and (orientation: portrait) {
+
+    .navbar {
+        display: none;
+    }
+
+    .mobile-navbar {
+        display: block;
+    }
+
+    .mobile-navbar .head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: white;
+        height: 80px;
+    }
+
+    .logo {
+        height: 100%;
+        aspect-ratio: 1/1;
+    }
+
+    #hamburger {
+        height: 100%;
+        aspect-ratio: 1/1;
+    }
+
+    .mobile-navbar img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+    }
+
+    .mobile-navbar .menu {
+        display: none;
+        justify-content: center;
+        gap: 1em;
+        font-size: 20px;
+        border: gray 2px solid;
+        border-radius: 5px;
+    }
+
 }
