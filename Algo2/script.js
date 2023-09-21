@@ -44,53 +44,53 @@ function AddVertex(canvas, x, y, color) {
     canvas.add(v);
 }
 
-function AddDirectedLine(canvas,coords,color,weight,position='up'){
-    if(typeof weight !=="string"){
-        weight=weight.toString();
+function AddDirectedLine(canvas, coords, color, weight, position = 'up') {
+    if (typeof weight !== "string") {
+        weight = weight.toString();
     }
     let ang;
-    if(coords[1]===coords[3]){
-        ang=90;
-    }else if (coords[1]<coords[3]){
-        ang=180-Math.atan((coords[2]-coords[0])/(coords[3]-coords[1]))*180/Math.PI;
-    }else{
-        ang=Math.atan((coords[2]-coords[0])/(coords[1]-coords[3]))*180/Math.PI;
+    if (coords[1] === coords[3]) {
+        ang = 90;
+    } else if (coords[1] < coords[3]) {
+        ang = 180 - Math.atan((coords[2] - coords[0]) / (coords[3] - coords[1])) * 180 / Math.PI;
+    } else {
+        ang = Math.atan((coords[2] - coords[0]) / (coords[1] - coords[3])) * 180 / Math.PI;
     }
-    let l=new fabric.Line(coords,{
+    let l = new fabric.Line(coords, {
         fill: color,
         stroke: color,
     });
-    let t=new fabric.Triangle({
-        width:10,
-        height:17,
-        fill:color,
-        left:(coords[0]+coords[2])/2-5,
-        top:(coords[1]+coords[3])/2-8.5,
+    let t = new fabric.Triangle({
+        width: 10,
+        height: 17,
+        fill: color,
+        left: (coords[0] + coords[2]) / 2 - 5,
+        top: (coords[1] + coords[3]) / 2 - 8.5,
     });
     t.rotate(ang);
-    if(position==='up'){
-        let text=new fabric.Text(weight,{
-            fontSize:10,
-            left:(coords[0]+coords[2])/2-5,
-            top:(coords[1]+coords[3])/2-20,
-            fill:color,
+    if (position === 'up') {
+        let text = new fabric.Text(weight, {
+            fontSize: 10,
+            left: (coords[0] + coords[2]) / 2 - 5,
+            top: (coords[1] + coords[3]) / 2 - 20,
+            fill: color,
         })
 
-        let g=new fabric.Group([l,t,text]);
-        g.selectable=false;
+        let g = new fabric.Group([l, t, text]);
+        g.selectable = false;
         canvas.add(g);
         g.sendToBack();
         return g;
-    }else{
-        let text=new fabric.Text(weight,{
-            fontSize:10,
-            left:(coords[0]+coords[2])/2+5,
-            top:(coords[1]+coords[3])/2+15,
-            fill:color,
+    } else {
+        let text = new fabric.Text(weight, {
+            fontSize: 10,
+            left: (coords[0] + coords[2]) / 2 + 5,
+            top: (coords[1] + coords[3]) / 2 + 15,
+            fill: color,
         })
 
-        let g=new fabric.Group([l,t,text]);
-        g.selectable=false;
+        let g = new fabric.Group([l, t, text]);
+        g.selectable = false;
         canvas.add(g);
         g.sendToBack();
         return g;
@@ -111,9 +111,9 @@ function AddRLine(canvas, coords, weight) {
     return g;
 }
 
-function AddFLine(canvas, coords,flow,capacity){
-    let str=flow.toString()+"/"+capacity.toString();
-    AddDirectedLine(canvas,coords,"black",str);
+function AddFLine(canvas, coords, flow, capacity) {
+    let str = flow.toString() + "/" + capacity.toString();
+    AddDirectedLine(canvas, coords, "black", str);
 }
 
 function ClearResidualMatrix() {
@@ -170,18 +170,18 @@ function DrawResidualNetwork(canvas) {
     canvas.renderAll();
 }
 
-function DrawFlowNetwork(canvas){
+function DrawFlowNetwork(canvas) {
     for (let i = 0; i < vertices.length; i++) {
         canvas.add(vertices[i]);
     }
     for (let i = 0; i < vertices.length; i++) {
         for (let j = 0; j < vertices.length; j++) {
-            let c=capacities_matrix[i][j];
+            let c = capacities_matrix[i][j];
             if (c !== -1) {
                 let p1 = vertices[i].getCenterPoint();
                 let p2 = vertices[j].getCenterPoint();
-                let f=flow_matrix[i][j];
-                AddFLine(canvas,[p1.x, p1.y, p2.x, p2.y],f,c);
+                let f = flow_matrix[i][j];
+                AddFLine(canvas, [p1.x, p1.y, p2.x, p2.y], f, c);
             }
         }
     }
@@ -400,7 +400,7 @@ function HandleCanvas(ins, b1, inp, canvas, subcanvas, options) {
         }
     } else if (step === 9) {
         if (options.target) {
-            if (options.target.type==="circle") {
+            if (options.target.type === "circle") {
                 cur = options.target;
                 cur_color = cur.fill;
                 cur.setFill("red");
@@ -426,7 +426,7 @@ function HandleCanvas(ins, b1, inp, canvas, subcanvas, options) {
         } else {
             step = 16;
         }
-    }else if (step === 15) {
+    } else if (step === 15) {
         canvas.clear();
         DrawFlowNetwork(canvas);
         step = 13;

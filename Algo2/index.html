@@ -8,24 +8,68 @@
     <script src="jquery-3.6.4.js"></script>
     <script src="fabric.js"></script>
     <script src="script.js"></script>
+    <script>
+        function Rotate(elem, start, end) {
+            if (start < end) {
+                let timer = setInterval(function () {
+                    start++;
+                    elem.css("rotate", start + "deg");
+                    if (start === end) clearInterval(timer);
+                })
+            } else {
+                let timer = setInterval(function () {
+                    start--;
+                    elem.css("rotate", start + "deg");
+                    if (start === end) clearInterval(timer);
+                })
+            }
+        }
+
+        function CallMenu() {
+            let menu = $(".mobile-navbar .menu");
+            let img = $("#hamburger img");
+            let bar = $(".mobile-navbar");
+            if (menu.css("display") === "none") {
+                Rotate(img, 0, 90);
+                menu.css("display", "grid");
+                bar.css({"border": "gray 2px solid", "border-radius": "5px"});
+            } else {
+                Rotate(img, 90, 0);
+                menu.css("display", "none");
+                bar.css({"border": "none", "border-radius": "none"});
+            }
+        }
+    </script>
 </head>
 <body>
+
 <!-- navbar begins here-->
 <nav class="navbar">
-    <div class="logo"><img src="../assets/logo.JPG" id="logo" alt="logo"></div>
-    <!-- menu -->
+    <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
     <ul class="menu">
-            <li><a href="../index.html">Projects></a></li>
-            <li><a href="">Ford-Fulkerson with BFS</a></li>
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Ford-Fulkerson with BFS</a></li>
     </ul>
 </nav>
-
-<header> Ford-Fulkerson with BFS Demo </header>
+<!-- mobile navbar begins here -->
+<nav class="mobile-navbar">
+    <div class="head">
+        <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
+        <button id="hamburger" onclick="CallMenu()"><img src="../assets/hamburger.png" alt="menu"></button>
+    </div>
+    <ul class="menu">
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Ford-Fulkerson with BFS</a></li>
+    </ul>
+</nav>
+<header> Ford-Fulkerson with BFS Demo</header>
 
 <div class="row" id="introduction">
     <p> &emsp; This is the project demo page by Ze for Algo2 class with Dr. Aloupis.</p>
-    <p> &emsp; Ford-Fulkerson method is an algorithm for determining the maximum flow in a directed graph with constant weights.
-        In this problem, we have a source S with unlimited resources, a destination T to send the resources, and other middle vertices.
+    <p> &emsp; Ford-Fulkerson method is an algorithm for determining the maximum flow in a directed graph with constant
+        weights.
+        In this problem, we have a source S with unlimited resources, a destination T to send the resources, and other
+        middle vertices.
         The weight of each edge in the graph denotes the maximum resources that can be transferred on that edge.
         The problem is to find out the maximum resources that can be transferred from S to T per time interval.</p>
     <p>&emsp; The colors of the edges used in the demo are the same as those in the lecture slides.

@@ -5,16 +5,58 @@
     <title>Lyric Writer</title>
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="../navbar.css">
+    <script src="../jquery-3.7.0.min.js"></script>
+    <script>
+        function Rotate(elem, start, end) {
+            if (start < end) {
+                let timer = setInterval(function () {
+                    start++;
+                    elem.css("rotate", start + "deg");
+                    if (start === end) clearInterval(timer);
+                })
+            } else {
+                let timer = setInterval(function () {
+                    start--;
+                    elem.css("rotate", start + "deg");
+                    if (start === end) clearInterval(timer);
+                })
+            }
+        }
+
+        function CallMenu() {
+            let menu = $(".mobile-navbar .menu");
+            let img = $("#hamburger img");
+            let bar = $(".mobile-navbar");
+            if (menu.css("display") === "none") {
+                Rotate(img, 0, 90);
+                menu.css("display", "grid");
+                bar.css({"border": "gray 2px solid", "border-radius": "5px"});
+            } else {
+                Rotate(img, 90, 0);
+                menu.css("display", "none");
+                bar.css({"border": "none", "border-radius": "none"});
+            }
+        }
+    </script>
 </head>
 <body>
-
 <!-- navbar begins here-->
 <nav class="navbar">
-    <div class="logo"><img src="../assets/logo.JPG" id="logo" alt="logo"></div>
-    <!-- menu -->
+    <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
     <ul class="menu">
-            <li><a href="../index.html">Projects></a></li>
-            <li><a href="">Lyric Writer</a></li>
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Lyric Writer</a></li>
+    </ul>
+</nav>
+<!-- mobile navbar begins here -->
+<nav class="mobile-navbar">
+    <div class="head">
+        <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
+        <button id="hamburger" onclick="CallMenu()"><img src="../assets/hamburger.png" alt="menu"></button>
+    </div>
+    <ul class="menu">
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Lyric Writer</a></li>
     </ul>
 </nav>
 
