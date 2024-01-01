@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CV Project</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../navbar.css">
+    <script src="../navbar.js"></script>
+</head>
+<body>
+
+<!-- navbar begins here-->
+<nav class="navbar">
+    <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
+    <ul class="menu">
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Active Contour Model</a></li>
+    </ul>
+</nav>
+<!-- mobile navbar begins here -->
+<nav class="mobile-navbar">
+    <div class="head">
+        <div class="logo"><img src="../assets/logo.JPG" alt="logo"></div>
+        <button id="hamburger" onclick="CallMenu()"><img src="../assets/hamburger.png" alt="menu"></button>
+    </div>
+    <ul class="menu">
+        <li><a href="../index.html">Projects></a></li>
+        <li><a href="">Active Contour Model</a></li>
+    </ul>
+</nav>
+<header>Active Contour Model</header>
+
+<article>
+    <section>
+        <h1> Introduction </h1>
+        <p> This is a project for my computer vision class.</p>
+        <p> Active contour model, also named "snakes," is an algorithm for delineating an object outline from a 2D image.
+            I made three major changes to the <a href="https://en.wikipedia.org/wiki/Active_contour_model">original algorithm</a>,
+            which will be discussed below.</p>
+        <p> This project is written in Python, and the code can be found <a href="https://github.com/ko5cles/Snake">here</a>.
+            The instructions to run the code are in README.md. This one uses Tkinter for GUI, which should be straightforward to use.
+        </p>
+    </section>
+
+    <section>
+        <h1> Major Changes</h1>
+        <p>
+            Two of the changes are about the energy function. One is about the window size.
+        </p>
+        <h2>
+            1.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>E</mi>
+                    <mrow>
+                        <mi>c</mi>
+                        <mi>o</mi>
+                        <mi>n</mi>
+                        <mi>t</mi>
+                    </mrow>
+                </msub>
+            </math>
+        </h2>
+        <p>
+            The original formula used is
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                    <msub>
+                        <mi>E</mi>
+                        <mrow>
+                            <mi>c</mi>
+                            <mi>o</mi>
+                            <mi>n</mi>
+                            <mi>t</mi>
+                        </mrow>
+                    </msub>
+                    <mo>=</mo>
+                    <msup>
+                        <mrow>
+                            <mo stretchy="true" form="prefix">(</mo>
+                            <mover>
+                                <mi>d</mi>
+                                <mo accent="true">‾</mo>
+                            </mover>
+                            <mo>−</mo>
+                            <mrow>
+                                <mo stretchy="true" form="prefix">|</mo>
+                                <mo stretchy="true" form="postfix">|</mo>
+                            </mrow>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>i</mi>
+                            </msub>
+                            <mo>−</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>−</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msub>
+                            <mrow>
+                                <mo stretchy="true" form="prefix">|</mo>
+                                <mo stretchy="true" form="postfix">|</mo>
+                            </mrow>
+                            <mo stretchy="true" form="postfix">)</mo>
+                        </mrow>
+                        <mn>2</mn>
+                    </msup>
+                </mrow>
+            </math>
+            for two consecutive points
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mi>i</mi>
+                </msub>
+            </math>
+            and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow>
+                        <mi>i</mi>
+                        <mo>−</mo>
+                        <mn>1</mn>
+                    </mrow>
+                </msub>
+            </math>.
+            One problem with this is that it will completely ignore the original outline specified by the user, which contains important information. Another problem is that it will try to make the points on the contour even spaced, ignoring the fact that some finer details may require more points to capture.
+        </p>
+        <p>
+            So, I propose an alternative that will try to make the contour more proportional to the original contour specified by the user. Before the first iteration, I record the initial length
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>o</mi>
+                    <mrow>
+                        <mi>i</mi>
+                        <mo>−</mo>
+                        <mn>1</mn>
+                    </mrow>
+                </msub>
+            </math>
+            between two consecutive points
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mi>i</mi>
+                </msub>
+            </math>
+            and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow>
+                        <mi>i</mi>
+                        <mo>−</mo>
+                        <mn>1</mn>
+                    </mrow>
+                </msub>
+            </math>.
+            The average proportion,
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mover>
+                    <mrow>
+                        <mi>p</mi>
+                        <mi>r</mi>
+                        <mi>o</mi>
+                        <mi>p</mi>
+                    </mrow>
+                    <mo accent="true">‾</mo>
+                </mover>
+            </math>,
+            is initially set to 1. For each iteration, the energy is calculated as
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                    <msub>
+                        <mi>E</mi>
+                        <mrow>
+                            <mi>c</mi>
+                            <mi>o</mi>
+                            <mi>n</mi>
+                            <mi>t</mi>
+                        </mrow>
+                    </msub>
+                    <mo>=</mo>
+                    <mrow>
+                        <mo stretchy="true" form="prefix">|</mo>
+                        <mn>1</mn>
+                        <mo>−</mo>
+                        <mfrac>
+                            <mrow>
+                                <mrow>
+                                    <mo stretchy="true" form="prefix">|</mo>
+                                    <mo stretchy="true" form="postfix">|</mo>
+                                </mrow>
+                                <msub>
+                                    <mi>p</mi>
+                                    <mi>i</mi>
+                                </msub>
+                                <mo>−</mo>
+                                <msub>
+                                    <mi>p</mi>
+                                    <mrow>
+                                        <mi>i</mi>
+                                        <mo>−</mo>
+                                        <mn>1</mn>
+                                    </mrow>
+                                </msub>
+                                <mrow>
+                                    <mo stretchy="true" form="prefix">|</mo>
+                                    <mo stretchy="true" form="postfix">|</mo>
+                                </mrow>
+                            </mrow>
+                            <mrow>
+                                <msub>
+                                    <mi>o</mi>
+                                    <mrow>
+                                        <mi>i</mi>
+                                        <mo>−</mo>
+                                        <mn>1</mn>
+                                    </mrow>
+                                </msub>
+                                <mo>×</mo>
+                                <mover>
+                                    <mrow>
+                                        <mi>p</mi>
+                                        <mi>r</mi>
+                                        <mi>o</mi>
+                                        <mi>p</mi>
+                                    </mrow>
+                                    <mo accent="true">‾</mo>
+                                </mover>
+                            </mrow>
+                        </mfrac>
+                        <mo stretchy="true" form="postfix">|</mo>
+                    </mrow>
+                </mrow>
+            </math>.
+            After each iteration, the average proportion is calculated as the sum of the proportion(current length between two points divided by the original length) divided by the number of points.
+        </p>
+        <p>
+            The effect of this is that the snake will be forced to shrink more in proportion.
+        </p>
+        <h2>
+            2.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>E</mi>
+                    <mrow>
+                        <mi>c</mi>
+                        <mi>u</mi>
+                        <mi>r</mi>
+                        <mi>v</mi>
+                    </mrow>
+                </msub>
+            </math>
+        </h2>
+        <p>
+            The original formula used is
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                    <msub>
+                        <mi>E</mi>
+                        <mrow>
+                            <mi>c</mi>
+                            <mi>u</mi>
+                            <mi>r</mi>
+                            <mi>v</mi>
+                        </mrow>
+                    </msub>
+                    <mo>=</mo>
+                    <mrow>
+                        <mo stretchy="true" form="prefix">|</mo>
+                        <mo stretchy="true" form="postfix">|</mo>
+                    </mrow>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow>
+                            <mi>i</mi>
+                            <mo>−</mo>
+                            <mn>1</mn>
+                        </mrow>
+                    </msub>
+                    <mo>−</mo>
+                    <mn>2</mn>
+                    <msub>
+                        <mi>p</mi>
+                        <mi>i</mi>
+                    </msub>
+                    <mo>+</mo>
+                    <msub>
+                        <mi>p</mi>
+                        <mrow>
+                            <mi>i</mi>
+                            <mo>+</mo>
+                            <mn>1</mn>
+                        </mrow>
+                    </msub>
+                    <msup>
+                        <mrow>
+                            <mo stretchy="true" form="prefix">|</mo>
+                            <mo stretchy="true" form="postfix">|</mo>
+                        </mrow>
+                        <mn>2</mn>
+                    </msup>
+                </mrow>
+            </math>
+            for three consecutive points
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow>
+                        <mi>i</mi>
+                        <mo>−</mo>
+                        <mn>1</mn>
+                    </mrow>
+                </msub>
+            </math>,
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mi>i</mi>
+                </msub>
+            </math>,
+            and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>p</mi>
+                    <mrow>
+                        <mi>i</mi>
+                        <mo>+</mo>
+                        <mn>1</mn>
+                    </mrow>
+                </msub>
+            </math>.
+            The problem with this is that it only forces the middle point of the three consecutive points to stay in the middle (in other words, it will encourage three points in a line). As a result, 90-degree corners are likely to form. In the original algorithm, the authors try to find these corners between iterations and set the β for those corners to zero to levitate the problem.
+        </p>
+        <h2>
+            3. Window Size
+        </h2>
+        <p>
+            In the original algorithm, the window size is a fixed number (3, 5, 7, etc).
+        </p>
+        <p>
+            To make the points stay where the gradient magnitude is larger, I propose adjusting the window size of a point based on the gradient magnitude of that point. If the gradient magnitude is large, the window size should be smaller; otherwise, the window size should be larger. For a 500x500 image, the formula used for window size is
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mrow>
+                    <mi>w</mi>
+                    <mo>=</mo>
+                    <msub>
+                        <mi>w</mi>
+                        <mrow>
+                            <mi>b</mi>
+                            <mi>a</mi>
+                            <mi>s</mi>
+                            <mi>e</mi>
+                        </mrow>
+                    </msub>
+                    <mrow>
+                        <mo stretchy="true" form="prefix">(</mo>
+                        <mo>−</mo>
+                        <mn>1.5</mn>
+                        <msup>
+                            <mi>m</mi>
+                            <mn>2</mn>
+                        </msup>
+                        <mo>+</mo>
+                        <mn>2</mn>
+                        <mo stretchy="true" form="postfix">)</mo>
+                    </mrow>
+                </mrow>
+            </math>,
+            with
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>w</mi>
+            </math>
+            being the window size,
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <msub>
+                    <mi>w</mi>
+                    <mrow>
+                        <mi>b</mi>
+                        <mi>a</mi>
+                        <mi>s</mi>
+                        <mi>e</mi>
+                    </mrow>
+                </msub>
+            </math>
+            as the base (=2), and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>m</mi>
+            </math>
+            is the gradient magnitude at that point.
+        </p>
+    </section>
+    <section>
+        <h1>
+            Sample Results
+        </h1>
+        <div class="figure">
+            <img src="figures/result1.png">
+            <p>
+                fig.1 Result 1
+            </p>
+        </div>
+        <div class="figure">
+            <img src="figures/result2.png">
+            <p>
+                fig.2 Result 2
+            </p>
+        </div>
+        <div class="figure">
+            <img src="figures/result3.png">
+            <p>
+                fig.3 Result 3
+            </p>
+        </div>
+    </section>
+
+</article>
+
+</body>
+</html>

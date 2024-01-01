@@ -11,13 +11,13 @@
         function Rotate(elem, start, end) {
             if (start < end) {
                 let timer = setInterval(function () {
-                    start++;
+                    start+=5;
                     elem.css("rotate", start + "deg");
                     if (start === end) clearInterval(timer);
                 })
             } else {
                 let timer = setInterval(function () {
-                    start--;
+                    start-=5;
                     elem.css("rotate", start + "deg");
                     if (start === end) clearInterval(timer);
                 })
