@@ -338,6 +338,101 @@
             </math>.
             The problem with this is that it only forces the middle point of the three consecutive points to stay in the middle (in other words, it will encourage three points in a line). As a result, 90-degree corners are likely to form. In the original algorithm, the authors try to find these corners between iterations and set the β for those corners to zero to levitate the problem.
         </p>
+        <p>
+            So I propose a softer alternative to that using the angle between lines. The new formula is
+            <math>
+                <mrow>
+                    <msub>
+                        <mi>E</mi>
+                        <mrow>
+                            <mi>c</mi>
+                            <mi>u</mi>
+                            <mi>r</mi>
+                            <mi>v</mi>
+                        </mrow>
+                    </msub>
+                    <mo>=</mo>
+                </mrow>
+                <mrow>
+                    <mn>1</mn>
+                    <mo>−</mo>
+                </mrow>
+                <mrow>
+                    <mfrac>
+                        <mrow>
+                            <mo form="prefix" stretchy="false" lspace="0em" rspace="0em">(</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>i</mi>
+                            </msub>
+                            <mo>−</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>−</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msub>
+                            <mo form="postfix" stretchy="false">)</mo>
+                            <mo form="prefix" stretchy="false">(</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>+</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msub>
+                            <mo>−</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>i</mi>
+                            </msub>
+                            <mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+                        </mrow>
+                        <mrow>
+                            <mi>|</mi>
+                            <mi>|</mi>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>i</mi>
+                            </msub>
+                            <mo>−</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>−</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msub>
+                            <mi>|</mi>
+                            <mi>|</mi>
+                            <mi>|</mi>
+                            <mi>|</mi>
+                            <msub>
+                                <mi>p</mi>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>+</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                            </msub>
+                            <mo>−</mo>
+                            <msub>
+                                <mi>p</mi>
+                                <mi>i</mi>
+                            </msub>
+                            <mi>|</mi>
+                            <mi>|</mi>
+                        </mrow>
+                    </mfrac>
+                </mrow>
+            </math>.
+            This formula will not force the middle of the three points to stay in the middle but also encourage an obtuse angle between lines. Also, this will prevent 90-degree corners from forming.
+        </p>
+
         <h2>
             3. Window Size
         </h2>
